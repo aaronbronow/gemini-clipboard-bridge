@@ -1,0 +1,8 @@
+[command]
+name = "copy"
+description = "Copy text to the system clipboard"
+usage = "/cb:copy <text>"
+
+[action]
+type = "script"
+path = "../../skills/clipboard/scripts/copy.sh"

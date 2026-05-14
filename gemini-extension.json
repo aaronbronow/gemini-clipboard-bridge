@@ -1,0 +1,9 @@
+{
+  "name": "gemini-clipboard-bridge",
+  "version": "1.0.0",
+  "description": "Cross-environment clipboard sync for Gemini CLI using OSC 52",
+  "author": "Aaron Bronow",
+  "repository": "https://github.com/aaronbronow/gemini-clipboard-bridge",
+  "contextFileName": "GEMINI.md",
+  "skills": ["clipboard"]
+}
