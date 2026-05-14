@@ -1,0 +1,7 @@
+description = "Display help for the agent-bridge-clipboard"
+prompt = """
+Agent Bridge Clipboard (/abc) Help:
+- /abc:copy <text> - Copies text to the host clipboard.
+- /abc:version      - Shows the current version.
+- /abc:help         - Shows this help message.
+"""

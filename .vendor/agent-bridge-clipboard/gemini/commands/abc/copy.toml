@@ -1,0 +1,5 @@
+description = "Copy text to the host clipboard via OSC 52"
+prompt = """
+The following text has been sent to the host clipboard using the agent-bridge-clipboard:
+!{./.agents/skills/agent-bridge-clipboard/scripts/copy.sh {{args}}}
+"""

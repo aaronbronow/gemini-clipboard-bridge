@@ -1,8 +1,5 @@
-[command]
-name = "copy"
-description = "Copy text to the system clipboard"
-usage = "/cb:copy <text>"
-
-[action]
-type = "script"
-path = "../../skills/clipboard/scripts/copy.sh"
+description = "Copy text to the host clipboard via OSC 52"
+prompt = """
+The following text has been sent to the host clipboard using the gemini-clipboard-bridge:
+!{./skills/gemini-clipboard-bridge/scripts/copy.sh {{args}}}
+"""

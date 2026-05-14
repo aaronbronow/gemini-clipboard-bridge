@@ -1,0 +1,2 @@
+description = "Check the version of the gemini-clipboard-bridge"
+prompt = "The current version of gemini-clipboard-bridge is 1.0.0."
