@@ -1,5 +1,5 @@
 description = "Copy text to the host clipboard via OSC 52"
 prompt = """
 The following text has been sent to the host clipboard using the gemini-clipboard-bridge:
-!{./skills/gemini-clipboard-bridge/scripts/copy.sh {{args}}}
+!{${extensionPath}/skills/gemini-clipboard-bridge/scripts/copy.sh {{args}}}
 """

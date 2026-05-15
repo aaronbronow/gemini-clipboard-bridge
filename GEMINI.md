@@ -31,3 +31,7 @@ To synchronize with the latest universal transport logic from upstream:
 ## Constraints
 - Only use the `clipboard` skill when explicitly asked to "copy", "save to clipboard", or "sync clipboard".
 - Do not attempt to read the clipboard; OSC 52 read support is write-only.
+
+## Troubleshooting
+### "No such file or directory" in commands
+In Gemini CLI, shell execution macros (`!{}`) in `.toml` command files resolve relative to the **current workspace directory** by default. To ensure extension scripts are found regardless of the user's location, always use the `${extensionPath}` variable (e.g., `!{${extensionPath}/path/to/script.sh}`). This was fixed in v1.0.2.

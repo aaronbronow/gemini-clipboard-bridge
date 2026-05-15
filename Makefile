@@ -14,7 +14,7 @@ import-upstream:
 	cp -rv .vendor/agent-bridge-clipboard/gemini/skills/agent-bridge-clipboard/* skills/gemini-clipboard-bridge/
 	cp -rv .vendor/agent-bridge-clipboard/gemini/commands/abc/* commands/cb/
 	# Fix script paths and re-brand commands/skills
-	sed -i 's|\./\.agents/skills/agent-bridge-clipboard/scripts/copy.sh|./skills/gemini-clipboard-bridge/scripts/copy.sh|g' commands/cb/*.toml
+	sed -i 's|\./\.agents/skills/agent-bridge-clipboard/scripts/copy.sh|${extensionPath}/skills/gemini-clipboard-bridge/scripts/copy.sh|g' commands/cb/*.toml
 	sed -i 's/agent-bridge-clipboard/gemini-clipboard-bridge/g' commands/cb/*.toml skills/gemini-clipboard-bridge/SKILL.md
 	sed -i 's/\/abc:/\/cb:/g' commands/cb/help.toml
 	sed -i 's/(\/abc)/(\/cb)/g' commands/cb/help.toml
