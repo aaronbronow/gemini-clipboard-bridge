@@ -26,6 +26,7 @@ To synchronize with the latest universal transport logic from upstream:
 ## Distribution & Ignoring
 - **.geminiignore**: We ignore the `.vendor/` directory to keep extension installations lean. 
 - **Persistence**: We intentionally **do not** ignore the `Makefile` or `tests/`. This ensures that AI agents can always perform integration tests and synchronize with upstream logic without manual intervention or configuration overrides.
+- **Release Boilerplate**: Every release **must** include the standard "Installation Instructions" boilerplate in the release notes to ensure users can easily adopt the extension.
 
 ## Constraints
 - Only use the `clipboard` skill when explicitly asked to "copy", "save to clipboard", or "sync clipboard".
