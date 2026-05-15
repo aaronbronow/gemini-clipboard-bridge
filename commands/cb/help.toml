@@ -1,7 +1,8 @@
 description = "Display help for the gemini-clipboard-bridge"
 prompt = """
-Gemini Clipboard Bridge (/cb) Help:
+<task>Display the following help information for Gemini Clipboard Bridge (/cb) to the user:
 - /cb:copy <text> - Copies text to the host clipboard.
 - /cb:version      - Shows the current version.
 - /cb:help         - Shows this help message.
+</task>
 """

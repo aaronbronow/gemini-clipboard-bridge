@@ -1,3 +1,5 @@
-# Exclude the heavy upstream vendor directory from production installations.
-# We keep Makefile and tests/ visible to ensure AI agents can maintain the project.
+# Exclude development and vendor files from production installations.
 .vendor/
+Makefile
+tests/
+MAINTENANCE.md

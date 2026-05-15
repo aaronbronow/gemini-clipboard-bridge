@@ -29,3 +29,20 @@ Ask Gemini to "copy the last code block to my clipboard" or use the slash comman
 ```bash
 /cb:copy "text to copy"
 ```
+
+## Sandbox Setup (Docker/Remote)
+If you are running Gemini CLI inside a Docker sandbox or a remote environment where the TTY is restricted, you must start a listener on your **host machine** to bridge the gap:
+
+### Option A: Raw Stream (Recommended)
+Run this in a separate terminal on your host (WSL/macOS/Linux):
+```bash
+# Pipes the raw escape sequences directly to your TTY
+tail -F .clipboard_bypass > $(tty)
+```
+
+### Option B: Named Pipe
+Run this in a separate terminal on your host:
+```bash
+mkfifo .clipboard_pipe
+cat .clipboard_pipe > $(tty)
+```

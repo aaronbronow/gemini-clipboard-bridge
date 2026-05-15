@@ -6,6 +6,9 @@ This project (`gemini-clipboard-bridge`) is a **Downstream Implementation** of t
 - **Upstream (`agent-bridge-clipboard`)**: The "Uber" project responsible for developing and testing the core transport mechanisms, multi-platform compatibility (SSH, WSL, Native), bypass fallbacks, and the universal protocol.
 - **Downstream (`gemini-clipboard-bridge`)**: This project. It wraps the universal core into a Gemini CLI extension, providing the specific AI Skill and command integrations required for Gemini agents.
 
+## Implementation Details
+The production-facing instructions are located in `INSTRUCTIONS.md`. This file is loaded by Gemini CLI when the extension is active. Keep it focused on usage and constraints.
+
 ## Update Process
 To synchronize with the latest universal transport logic from upstream:
 1. Ensure `agent-bridge-clipboard` is located at `../agent-bridge-clipboard`.

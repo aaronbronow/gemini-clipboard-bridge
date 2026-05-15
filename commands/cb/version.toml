@@ -1,2 +1,2 @@
 description = "Check the version of the gemini-clipboard-bridge"
-prompt = "The current version of gemini-clipboard-bridge is 1.0.3."
+prompt = "<task>Inform the user that the current version of gemini-clipboard-bridge is 1.0.3. Output ONLY the version number or a very short confirmation.</task>"

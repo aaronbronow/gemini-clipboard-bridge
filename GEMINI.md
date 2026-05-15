@@ -1,16 +1,17 @@
-# Gemini Clipboard Bridge Instructions
+# Workspace Memory & Learnings
 
-## Overview
-This extension provides a mechanism for Gemini to interact with the system clipboard across remote boundaries (SSH, WSL, containers) using the OSC 52 terminal escape sequence.
+This file contains local development notes and learnings for the `gemini-clipboard-bridge` project. It is intended for developers working in this repository and is excluded from production extension installations via `.geminiignore`.
 
-## Architecture
-- **Skill**: The `gemini-clipboard-bridge` skill (in `skills/gemini-clipboard-bridge/SKILL.md`) instructs the AI on how to use the `copy.sh` script.
-- **Commands**: Shortcut commands are provided via the `/cb` prefix (e.g., `/cb:copy`, `/cb:help`).
-- **Bypass**: The `copy.sh` script targets `${SSH_TTY:-/dev/tty}` and shared files/pipes to ensure the escape sequence reaches the host terminal emulator.
+## Extension Architecture
+- **Context Separation**: Production-facing instructions are in `INSTRUCTIONS.md` (configured in `gemini-extension.json`).
+- **Developer Guidance**: Project maintenance and upstream sync details are in `MAINTENANCE.md`.
+- **Command Prompts**: Use `<task>` tags in `.toml` command prompts to ensure the agent executes the instruction directly rather than treating it as a conversational suggestion.
 
-## Constraints
-- Only use the `clipboard` skill when explicitly asked to "copy", "save to clipboard", or "sync clipboard".
-- Do not attempt to read the clipboard; OSC 52 read support is write-only.
+## Key Learnings
+- **Agent Confusion**: Including complex maintenance instructions in the production context can cause agents to enter "developer mode" unexpectedly. Keep `INSTRUCTIONS.md` lean.
+- **Variable Substitution**: In `.toml` commands, `${extensionPath}` is **not** supported; use absolute paths like `~/.gemini/extensions/...`.
+- **OSC 52 Constraints**: The transport is write-only. Agents must be instructed not to attempt to read the clipboard.
 
-## Maintenance
-For project maintenance, upstream synchronization, and contributor guidelines, see `MAINTENANCE.md`.
+## Upstream Synchronization
+- Always use `make import-upstream` to pull in core logic from `agent-bridge-clipboard`.
+- Branding is automatically applied during the import process via `sed` in the `Makefile`.
