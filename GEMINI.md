@@ -36,4 +36,9 @@ To synchronize with the latest universal transport logic from upstream:
 
 ## Troubleshooting
 ### "No such file or directory" in commands
-In Gemini CLI, shell execution macros (`!{}`) in `.toml` command files resolve relative to the **current workspace directory** by default. While `${extensionPath}` is supported in `.json` configuration files, it is **not supported** in `.toml` command files as of v0.42.0. To ensure extension scripts are found regardless of the user's location, use a shell-expandable absolute path (e.g., `!{~/.gemini/extensions/gemini-clipboard-bridge/path/to/script.sh}`). This was fixed in v1.0.3.
+In Gemini CLI, shell execution macros (`!{}`) in `.toml` command files resolve relative to the **current workspace directory** by default. 
+
+**Important Note on Variable Substitution:**
+According to the official [Custom Commands Documentation](https://geminicli.com/docs/cli/custom-commands#executing-shell-commands), `${extensionPath}` is only supported for variable substitution in `gemini-extension.json` and `hooks/hooks.json`. It is **not** supported in `.toml` command files, where `{{args}}` is the only variable currently supported for interpolation within shell execution macros (`!{...}`).
+
+To ensure extension scripts are found regardless of the user's location in a `.toml` command, you must use a shell-expandable absolute path (e.g., `!{~/.gemini/extensions/gemini-clipboard-bridge/path/to/script.sh}`). This was standardized in v1.0.3.
