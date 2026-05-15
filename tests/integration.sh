@@ -61,7 +61,7 @@ done
 
 # 3. Verify Path Integrity in Commands
 echo -e "\n${BLUE}Verifying Path Integrity...${NC}"
-check_path "commands/cb/copy.toml" "\${extensionPath}/skills/gemini-clipboard-bridge/scripts/copy.sh"
+check_path "commands/cb/copy.toml" "~/.gemini/extensions/gemini-clipboard-bridge/skills/gemini-clipboard-bridge/scripts/copy.sh"
 
 # 4. Verify Script Executability
 echo -e "\n${BLUE}Verifying Script Permissions...${NC}"
