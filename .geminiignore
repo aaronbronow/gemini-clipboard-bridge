@@ -1,5 +1,6 @@
 # Exclude development and vendor files from production installations.
-.vendor/
-Makefile
-tests/
-MAINTENANCE.md
+/.vendor/
+/Makefile
+/tests/
+/MAINTENANCE.md
+/GEMINI.md
