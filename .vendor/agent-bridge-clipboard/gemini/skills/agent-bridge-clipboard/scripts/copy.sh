@@ -21,7 +21,13 @@ if [[ "$OSTYPE" == "darwin"* ]] && command -v pbcopy >/dev/null; then
     exit 0
 fi
 
-# 2. Secondary: Direct TTY write (works in SSH and local shells)
+# 2. Secondary: Direct SSH TTY bypass (Reliable for remote background/subshells)
+if [ -n "$SSH_TTY" ] && [ -w "$SSH_TTY" ]; then
+    printf "%s" "$osc52_sequence" > "$SSH_TTY"
+    exit 0
+fi
+
+# 3. Tertiary: Direct TTY write (works in local interactive shells)
 if [ -w "/dev/tty" ]; then
     printf "%s" "$osc52_sequence" > /dev/tty
     exit 0

@@ -14,7 +14,7 @@ The verification process for the `tests/COMPATIBILITY.md` matrix is handled **st
 - **Mandatory Metadata**: You MUST provide client metadata via environment variables for accurate matrix reporting.
 - **Workflow**:
   ```bash
-  CLIENT_OS="Windows" CLIENT_TERM="Windows Terminal" GEMINI_MODE="Default" ./tests/verify.sh
+  CLIENT_OS="Windows" CLIENT_TERM="Windows Terminal" AGENT_MODE="Default" ./tests/verify.sh
   ```
 - **Manual testing bypass**: Do NOT attempt to run manual tests or individual commands for the purpose of updating the matrix. Use the script to ensure consistent logging.
 - **Verification**: When prompted by the script, paste your clipboard content (Ctrl+V/Cmd+V) to verify the result.
@@ -30,6 +30,7 @@ The verification process for the `tests/COMPATIBILITY.md` matrix is handled **st
 - **Columns**: User Environment, Agent Environment, Agent Mode, Connection, Method, Status.
 
 ## Current Focus
+- **VS Code Terminal Testing**: Investigate and verify OSC 52 support within the VS Code integrated terminal, specifically handling the security gating (`terminal.integrated.allowOsc52`).
 - **SSH Bypass Testing**: The next priority is testing the `SSH_TTY` bypass logic on remote environments (e.g., `ubuntu-dev`).
 - **OSC 52 Troubleshooting**: We've confirmed that standard OSC 52 escapes are captured by the Gemini CLI subshell in local WSL2/xterm-256color environments. Testing via a direct SSH TTY is the next step to verify if we can bypass this capture.
 - **WSL Success**: We have confirmed `clip.exe` and `powershell.exe` as successful fallback methods for local WSL2 sessions.
@@ -59,22 +60,51 @@ Direct clipboard access from the Docker sandbox is restricted by environment iso
 ### Sandbox Bypass Protocols (Verified)
 The following protocols bridge the sandbox and host clipboard by using shared workspace files as signaling channels. These mechanisms are abstracted by `copy.sh` and verified via `tests/verify.sh`.
 
-#### 1. Named Pipe (FIFO)
-- **Status**: **SUCCESS** - Preferred for low-latency.
+#### 1. SSH TTY Redirection (Remote/Background)
+- **Status**: **SUCCESS** - Most reliable for remote environments.
+- **Mechanism**: Writing directly to the `$SSH_TTY` device (e.g., `/dev/pts/0`) bypasses Gemini CLI subshell capture, even from background processes.
+- **Command**: `printf '\e]52;c;... \a' > $SSH_TTY`
+
+#### 2. Named Pipe (FIFO)
+- **Status**: **SUCCESS** - Preferred for low-latency local sandboxes.
 - **Host Listener**: `while true; do cat .clipboard_pipe; done > $(tty)`
 - **Mechanism**: The system writes OSC 52 escape sequences to `.clipboard_pipe`.
 
-#### 2. File-Based signaling
-- **Status**: **SUCCESS** - Robust fallback.
-- **Host Listener**: `tail -F .clipboard_bypass > $(tty)`
+#### 3. File-Based signaling
+- **Status**: **SUCCESS** - Robust fallback for local sandboxes.
+- **Host Listener**: `tail -F .clipboard_bypass > $(tty) &` (Can be run in background of same session).
 - **Mechanism**: The system writes OSC 52 escape sequences to `.clipboard_bypass`.
+
+### Headless Verification Protocol
+For testing in non-interactive environments (e.g., background tasks, `run_shell_command`), use the Headless Mode via the `Makefile`.
+
+1. **Initiate Test (Agent)**: 
+   ```bash
+   make headless METHOD=<method_name>
+   ```
+   *Common methods: `osc52-ssh`, `osc52-stdout`, `bypass-file`.*
+2. **Retrieve Token (User)**: The script generates a unique token and attempts to write it to the clipboard.
+3. **Validate Result (User)**:
+   ```bash
+   make validate TOKEN=<paste_clipboard_here>
+   ```
+   *A mismatch or empty paste indicates capture or transport failure.*
+
+### One-off Prompt Protocol (gemini -p)
+To use the clipboard bridge with one-off prompts, you must elevate the agent's permission mode. Non-interactive mode defaults to a read-only policy that blocks shell tools.
+
+- **Command**: `gemini -p "copy 'it worked!' to the clipboard" --yolo`
+- **Result**: In remote sessions, this triggers the `SSH_TTY` bypass and updates your host clipboard natively.
+
+## Current Focus
 
 #### Bridge Logic (`copy.sh`)
 The `copy.sh` bridge prioritizes execution as follows:
 1. **Native Tools**: Uses `clip.exe` (WSL) or `pbcopy` (macOS) if available in the local environment.
-2. **Direct TTY**: Writes to `/dev/tty` (effective for remote SSH sessions).
-3. **Bypass Channels**: Writes to both `.clipboard_bypass` and `.clipboard_pipe` (required for Docker Sandboxes).
-4. **Stdout**: Final fallback to the primary output stream.
+2. **SSH TTY Bypass**: Writes to `$SSH_TTY` (e.g., `/dev/pts/0`) for remote background/headless reliability.
+3. **Direct TTY**: Writes to `/dev/tty` (effective for local interactive sessions).
+4. **Bypass Channels**: Writes to both `.clipboard_bypass` and `.clipboard_pipe` (required for Docker Sandboxes).
+5. **Stdout**: Final fallback to the primary output stream.
 
 ## Environment Notes
 - **WSL2 (Ubuntu 24.04)**: Requires `clip.exe` or `powershell.exe` for reliable clipboard access due to subshell output capture.

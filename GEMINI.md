@@ -23,6 +23,10 @@ To synchronize with the latest universal transport logic from upstream:
 ## Verification
 - Use `cd .vendor/agent-bridge-clipboard && ./tests/verify.sh` to run the interactive compatibility matrix test.
 
+## Distribution & Ignoring
+- **.geminiignore**: We ignore the `.vendor/` directory to keep extension installations lean. 
+- **Persistence**: We intentionally **do not** ignore the `Makefile` or `tests/`. This ensures that AI agents can always perform integration tests and synchronize with upstream logic without manual intervention or configuration overrides.
+
 ## Constraints
 - Only use the `clipboard` skill when explicitly asked to "copy", "save to clipboard", or "sync clipboard".
 - Do not attempt to read the clipboard; OSC 52 read support is write-only.
