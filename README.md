@@ -8,8 +8,20 @@ A Gemini CLI extension that enables cross-environment clipboard synchronization 
 - **Slash Command**: Manual copy shortcut via `/cb:copy`.
 
 ## Installation
+To install the extension, use the fully qualified URL:
 ```bash
-gemini extensions install aaronbronow/gemini-clipboard-bridge
+gemini extensions install https://github.com/aaronbronow/gemini-clipboard-bridge
+```
+
+## Update
+To update an existing installation:
+```bash
+gemini extensions update gemini-clipboard-bridge
+```
+
+Or update all extensions:
+```bash
+gemini extensions update --all
 ```
 
 ## Usage
