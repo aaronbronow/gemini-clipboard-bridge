@@ -69,7 +69,7 @@ Or update all extensions:
 gemini extensions update --all
 ```
 
-## Usage
+## Commands
 Ask Gemini to "copy the last code block to my clipboard" or use the slash command:
 ```bash
 /cb:copy "text to copy"
