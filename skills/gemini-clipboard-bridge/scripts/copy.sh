@@ -1,47 +1,89 @@
 #!/bin/bash
-# Gemini Skill Clipboard Bridge
-# This script works across WSL, macOS, and Linux, including sandboxed environments.
+# Agent Bridge Clipboard copy utility script
+# Enable debug mode by creating a file named '.clipboard_debug' in the agent working directory
+# or by setting ABC_DEBUG=1 in the environment.
+DEBUG=false
+if [ -f ".clipboard_debug" ] || [ "$ABC_DEBUG" = "1" ]; then
+    DEBUG=true
+    DEBUG_LOG="clipboard_debug.log"
+    echo "--- $(date) ---" >> "$DEBUG_LOG"
+    echo "Args: $*" >> "$DEBUG_LOG"
+fi
+
+log_debug() {
+    if [ "$DEBUG" = true ]; then
+        echo "$1" >> "$DEBUG_LOG"
+    fi
+}
+
+# Detect if we are in a container/sandbox
+IS_SANDBOX=false
+if [ -f "/.dockerenv" ] || grep -q "docker" /proc/self/cgroup 2>/dev/null; then
+    IS_SANDBOX=true
+    log_debug "Sandbox/Container detected"
+fi
 
 encoded=$(echo -n "$*" | base64 | tr -d '\n')
 osc52_sequence=$(printf "\e]52;c;%s\a" "$encoded")
 
 # 1. Primary: Platform-Native Tools (WSL/macOS)
-if grep -qi microsoft /proc/version 2>/dev/null; then
-    if command -v clip.exe >/dev/null; then
-        echo -n "$*" | clip.exe
-        exit 0
-    elif [ -f "/mnt/c/Windows/System32/clip.exe" ]; then
-        echo -n "$*" | /mnt/c/Windows/System32/clip.exe
+# Only attempt native tools if NOT in a sandbox (usually lack host access)
+if [ "$IS_SANDBOX" = false ]; then
+    if grep -qi microsoft /proc/version 2>/dev/null; then
+        log_debug "Detected WSL/Microsoft environment"
+        if command -v clip.exe >/dev/null; then
+            log_debug "Found clip.exe in PATH, using it"
+            echo -n "$*" | clip.exe
+            exit 0
+        elif [ -f "/mnt/c/Windows/System32/clip.exe" ]; then
+            log_debug "Found clip.exe at absolute path, using it"
+            echo -n "$*" | /mnt/c/Windows/System32/clip.exe
+            exit 0
+        elif command -v powershell.exe >/dev/null; then
+            log_debug "Found powershell.exe, using it"
+            echo -n "$*" | powershell.exe -NoProfile -NonInteractive -Command "Set-Clipboard -Value \$Input"
+            exit 0
+        fi
+    fi
+
+    if [[ "$OSTYPE" == "darwin"* ]] && command -v pbcopy >/dev/null; then
+        log_debug "Detected macOS, using pbcopy"
+        echo -n "$*" | pbcopy
         exit 0
     fi
 fi
 
-if [[ "$OSTYPE" == "darwin"* ]] && command -v pbcopy >/dev/null; then
-    echo -n "$*" | pbcopy
-    exit 0
-fi
-
 # 2. Secondary: Direct SSH TTY bypass (Reliable for remote background/subshells)
 if [ -n "$SSH_TTY" ] && [ -w "$SSH_TTY" ]; then
+    log_debug "Writing OSC 52 to SSH_TTY: $SSH_TTY"
     printf "%s" "$osc52_sequence" > "$SSH_TTY"
     exit 0
 fi
 
-# 3. Tertiary: Direct TTY write (works in local interactive shells)
-if [ -w "/dev/tty" ]; then
-    printf "%s" "$osc52_sequence" > /dev/tty
-    exit 0
-fi
+# 3. Bypass Channels (Mandatory for Sandbox, Fallback for Native)
+log_debug "Writing to sandbox bypass channels"
 
-# 2. Fallback: Sandbox Bypass Channels
-# Write to a regular file using atomic move to ensure listeners (like tail -F) detect it
+# Write to a regular file using atomic move
 printf "%s" "$osc52_sequence" > .clipboard_bypass.tmp
 mv .clipboard_bypass.tmp .clipboard_bypass
+log_debug "Wrote to .clipboard_bypass"
 
-# Write to a FIFO if it exists (for low-latency listeners)
+# Write to a FIFO if it exists
 if [ -p ".clipboard_pipe" ]; then
+    log_debug "Writing to .clipboard_pipe"
     printf "%s" "$osc52_sequence" > .clipboard_pipe &
 fi
 
-# 3. Last Resort: Stdout (likely captured by agent, but good for local debugging)
+# 4. Direct TTY write (Secondary fallback)
+# In some sandboxes, /dev/tty is writable but isolated. 
+if [ -w "/dev/tty" ]; then
+    log_debug "Writing OSC 52 to /dev/tty"
+    printf "%s" "$osc52_sequence" > /dev/tty
+    if [ "$IS_SANDBOX" = false ]; then
+        exit 0
+    fi
+fi
+
+# 5. Last Resort: Stdout
+log_debug "Writing OSC 52 to stdout"
 printf "%s" "$osc52_sequence"

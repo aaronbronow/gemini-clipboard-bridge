@@ -49,7 +49,6 @@ check_path() {
 echo -e "${BLUE}Checking Directory Structure...${NC}"
 check_file "commands/cb/copy.toml"
 check_file "commands/cb/help.toml"
-check_file "commands/cb/version.toml"
 check_file "skills/gemini-clipboard-bridge/SKILL.md"
 check_file "skills/gemini-clipboard-bridge/scripts/copy.sh"
 
